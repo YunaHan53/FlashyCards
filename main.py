@@ -1,7 +1,25 @@
 from tkinter import *
+import pandas as pd
+import random
 
 BACKGROUND_COLOR = "#B1DDC6"
 
+# ---------------------------- CREATE FLASH CARDS ------------------------------- #
+df = pd.read_excel(
+    'data/korean_1000_words.xlsx',
+    sheet_name="Sheet1",        # First sheet (or use sheet name)
+    header=0,            # Row to use as column names
+    usecols='A:B',       # Only read specified columns
+    nrows=100            # Only read first 100 rows
+)
+vocab_dictionary = df.to_dict()
+
+def next_word():
+    word = random.choice(vocab_dictionary["Korean"])
+    canvas.itemconfig(word_text, text=f"{word}")
+
+
+# ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Flashy - the Interactive Flash Card app")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
@@ -11,18 +29,18 @@ canvas = Canvas(width=800, height=550, bg=BACKGROUND_COLOR, highlightthickness=0
 card_front_img = PhotoImage(file="images/card_front.png")
 canvas.create_image(400, 263, image=card_front_img)
 canvas.create_text(400, 150, text="Korean", font=("Ariel", 40, "italic"))
-canvas.create_text(400, 263, text="하다", font=("Ariel", 60, "bold"))
+word_text = canvas.create_text(400, 263, text="word", font=("Ariel", 60, "bold"))
 canvas.grid(row=0, column=0, columnspan=2)
 
 # card_back_img = PhotoImage(file="images/card_back.png")
 
 # Display buttons
 x_img = PhotoImage(file="images/wrong.png")
-x_button = Button(image=x_img, highlightthickness=0, bg=BACKGROUND_COLOR)
+x_button = Button(image=x_img, highlightthickness=0, bg=BACKGROUND_COLOR, command=next_word)
 x_button.grid(row=1, column=0)
 
 check_img = PhotoImage(file="images/right.png")
-check_button = Button(image=check_img, highlightthickness=0, bg=BACKGROUND_COLOR)
+check_button = Button(image=check_img, highlightthickness=0, bg=BACKGROUND_COLOR, command=next_word)
 check_button.grid(row=1, column=1)
 
 
