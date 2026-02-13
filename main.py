@@ -3,7 +3,7 @@ import pandas as pd
 import random
 
 BACKGROUND_COLOR = "#B1DDC6"
-timer = None
+
 # ---------------------------- CREATE FLASH CARDS ------------------------------- #
 df = pd.read_excel(
     'data/korean_1000_words.xlsx',
@@ -13,21 +13,24 @@ df = pd.read_excel(
     nrows=100            # Only read first 100 rows
 )
 vocab_dictionary = df.to_dict(orient="records")
+current_card = {}
 
-def next_card():
-    global timer
+def start_review():
+    global current_card, timer
     current_card = random.choice(vocab_dictionary)
     canvas.itemconfig(card_img, image=card_front_img)
-    canvas.itemconfig(language_text, text="Korean")
-    canvas.itemconfig(word_text, text=current_card["Korean"])
-
+    canvas.itemconfig(language_text, text="Korean", fill="black")
+    canvas.itemconfig(word_text, text=current_card["Korean"], fill="black")
     timer = window.after(3000, flip_card, current_card)
+
+def next_card():
+    window.after_cancel(timer)
+    start_review()
 
 def flip_card(card):
     canvas.itemconfig(card_img, image=card_back_img)
-    canvas.itemconfig(language_text, text="English")
-    canvas.itemconfig(word_text, text=card["English"])
-
+    canvas.itemconfig(language_text, text="English", fill="white")
+    canvas.itemconfig(word_text, text=card["English"], fill="white")
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
@@ -53,7 +56,7 @@ check_img = PhotoImage(file="images/right.png")
 check_button = Button(image=check_img, highlightthickness=0, bg=BACKGROUND_COLOR, command=next_card)
 check_button.grid(row=1, column=1)
 
-start_button = Button(text="Start",bg="white", font=("Ariel", 24, "bold"), command=next_card)
+start_button = Button(text="Start",bg="white", font=("Ariel", 20, "bold"), command=start_review)
 start_button.grid(row=2, column=0, columnspan=2)
 
 
