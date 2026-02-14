@@ -11,14 +11,13 @@ cards_to_review = {}
 # ---------------------------- CREATE FLASH CARDS ------------------------------- #
 try:
     df = pd.read_csv('data/words_to_learn.csv')
-except FileNotFoundError or EmptyDataError:
+except (FileNotFoundError, EmptyDataError):
     original_df = pd.read_excel(
         'data/korean_1000_words.xlsx',
         sheet_name="Sheet1",        # First sheet (or use sheet name)
         header=0,            # Row to use as column names
-        usecols='A:B',       # Only read specified columns
-        nrows= 100
-    )
+        usecols='A:B'       # Only read specified columns
+    ).sample(n=100)
     cards_to_review = original_df.to_dict(orient="records")
 else:
     cards_to_review = df.to_dict(orient="records")
@@ -28,6 +27,7 @@ finally:
 
 def start_review():
     global current_card, timer
+    start_button.config(state="disabled")
     current_card = random.choice(cards_to_review)
     canvas.itemconfig(card_img, image=card_front_img)
     canvas.itemconfig(language_text, text="Korean", fill="black")
@@ -38,6 +38,7 @@ def next_card():
     window.after_cancel(timer)
     if len(cards_to_review) == 0:
         messagebox.showwarning(title="End of Card Deck", message="There are no more cards!")
+        window.destroy()
     else:
         start_review()
 
@@ -77,7 +78,7 @@ check_img = PhotoImage(file="images/right.png")
 check_button = Button(image=check_img, highlightthickness=0, bg=BACKGROUND_COLOR, command=is_known)
 check_button.grid(row=1, column=1)
 
-start_button = Button(text="Start",bg="white", font=("Ariel", 20, "bold"), command=start_review)
+start_button = Button(text="Start", bg="white", font=("Ariel", 20, "bold"), command=start_review)
 start_button.grid(row=2, column=0, columnspan=2)
 
 
