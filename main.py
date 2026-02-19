@@ -49,7 +49,6 @@ def flip_card(card):
 
 def is_known():
     cards_to_review.remove(current_card)
-    print(len(cards_to_review))
     data = pd.DataFrame(cards_to_review)
     data.to_csv('data/words_to_learn.csv', index=False)
     next_card()
